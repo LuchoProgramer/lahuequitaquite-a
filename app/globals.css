@@ -1,26 +1,112 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: #eebd2b;
+  --color-accent: #eebd2b;
+  --color-luxury-gold: #eebd2b;
+  --color-background-dark: #181611;
+  --color-surface-dark: #221d10;
+  --color-card: #221d10;
+  --color-border: rgba(255, 255, 255, 0.05);
+  
+  --font-sans: var(--font-plus-jakarta), var(--font-geist-sans), system-ui;
+  --font-display: var(--font-plus-jakarta), var(--font-playfair);
+  
+  --radius-DEFAULT: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #f8f7f6;
+  --foreground: #181611;
+}
+
+.dark {
+  --background: #181611;
+  --foreground: #f8f7f6;
+  --card: #221d10;
+  --border: rgba(255, 255, 255, 0.05);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Force dark mode for now as per design */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #181611;
+    --foreground: #f8f7f6;
+  }
+}
+
+html {
+  background: #181611;
+}
+
+/* Glassmorphism Effect */
+.glass {
+  background: rgba(24, 22, 17, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-nav {
+  background: rgba(24, 22, 17, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Premium Gradient Text */
+.text-gold-gradient {
+  background: linear-gradient(to right, #eebd2b, #fdfcfb, #eebd2b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Custom Scrollbar - Hidden for specific elements or custom styled */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: #181611;
+}
+::-webkit-scrollbar-thumb {
+  background: #221d10;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #eebd2b;
+}
+
+/* Lux transitions */
+.lux-transition {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Material Symbols sizing */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.custom-checkbox:checked {
+  background-color: #eebd2b;
+  border-color: #eebd2b;
 }
