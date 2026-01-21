@@ -1,0 +1,118 @@
+# robots.txt - La Huequita Quiteña
+# Configurado para permitir acceso completo a IAs y crawlers
+# con restricciones en puntos críticos
+
+# ============================================
+# ACCESO COMPLETO PARA TODAS LAS IAs
+# ============================================
+
+# Google (Googlebot, Gemini, Bard)
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 1
+
+User-agent: Google-Extended
+Allow: /
+Crawl-delay: 1
+
+# OpenAI (ChatGPT, GPT-4)
+User-agent: GPTBot
+Allow: /
+Crawl-delay: 1
+
+# Anthropic (Claude)
+User-agent: ClaudeBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: anthropic-ai
+Allow: /
+Crawl-delay: 1
+
+# Microsoft (Bing, Copilot)
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Amazon
+User-agent: Amazonbot
+Allow: /
+Crawl-delay: 1
+
+# Meta (Facebook, Instagram)
+User-agent: FacebookBot
+Allow: /
+Crawl-delay: 1
+
+User-agent: facebookexternalhit
+Allow: /
+Crawl-delay: 1
+
+# Twitter/X
+User-agent: Twitterbot
+Allow: /
+Crawl-delay: 1
+
+# Otros crawlers legítimos
+User-agent: *
+Allow: /
+Crawl-delay: 2
+
+# ============================================
+# RESTRICCIONES EN PUNTOS CRÍTICOS
+# ============================================
+
+# Bloquear APIs internas (solo para frontend)
+Disallow: /api/revalidate
+Disallow: /_next/
+Disallow: /_vercel/
+
+# Bloquear archivos de configuración
+Disallow: /*.json$
+Disallow: /*.config.*$
+
+# ============================================
+# ÁREAS PERMITIDAS EXPLÍCITAMENTE
+# ============================================
+
+# Productos (alta prioridad para IAs)
+Allow: /productos
+Allow: /producto/*
+
+# Páginas legales (importante para compliance)
+Allow: /terminos
+Allow: /privacidad
+Allow: /politicas
+
+# Feed para Google Merchant Center
+Allow: /feed.xml
+
+# API pública para UCP (Universal Commerce Protocol)
+# Esto permite que IAs compren directamente
+Allow: /api/ucp/*
+
+# ============================================
+# SITEMAPS
+# ============================================
+
+Sitemap: https://lahuequitaquitena.com/sitemap.xml
+Sitemap: https://lahuequitaquitena.com/feed.xml
+
+# ============================================
+# NOTAS PARA DESARROLLADORES
+# ============================================
+# 
+# Este archivo permite:
+# ✅ Crawling completo de productos
+# ✅ Indexación por Google, Gemini, ChatGPT, Claude
+# ✅ Compras directas desde IAs (UCP)
+# ✅ Acceso a páginas legales
+# 
+# Bloquea:
+# ❌ APIs internas de Next.js
+# ❌ Archivos de configuración
+# ❌ Endpoints de revalidación
+# 
+# Crawl-delay: Tiempo en segundos entre requests
+# - IAs principales: 1 segundo (rápido)
+# - Otros bots: 2 segundos (moderado)
