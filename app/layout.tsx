@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   description: "La mejor selección de licores en Quito con envío a domicilio via WhatsApp.",
 };
 
+import AgeGate from "@/components/AgeGate";
+import Footer from "@/components/common/Footer";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -43,12 +46,15 @@ export default function RootLayout({
         <BranchProvider>
           <UIProvider>
             <CartProvider>
-              <div className="min-h-screen flex flex-col">
-                <main className="flex-grow">
-                  {children}
-                </main>
-                <BottomNav />
-              </div>
+              <AgeGate>
+                <div className="min-h-screen flex flex-col">
+                  <main className="flex-grow">
+                    {children}
+                  </main>
+                  <Footer />
+                  <BottomNav />
+                </div>
+              </AgeGate>
             </CartProvider>
           </UIProvider>
         </BranchProvider>

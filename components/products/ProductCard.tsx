@@ -48,15 +48,21 @@ export default function ProductCard(product: ProductCardProps) {
             className={`group relative flex flex-col bg-surface-dark rounded-xl overflow-hidden border border-white/5 hover:border-primary/30 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5 ${isOutOfStock ? 'opacity-70 grayscale-[0.5]' : ''}`}
         >
             {/* Product Image Area */}
-            <div className={`relative w-full pt-[120%] ${imagen ? 'bg-black' : 'bg-[#1a1814]'} overflow-hidden`}>
-                <Link href={`/producto/${slug}`}>
+            {/* Product Image Area - Spotlight Effect */}
+            <div className="relative w-full aspect-square bg-[#0f0e0d] overflow-hidden">
+                {/* Spotlight Gradient */}
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-700"></div>
+
+                <Link href={`/producto/${slug}`} className="absolute inset-0 p-6 flex items-center justify-center">
                     <img
                         src={getImageUrl(imagen) || "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop"}
                         alt={nombre}
-                        className="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"
+                        className="w-full h-full object-contain drop-shadow-2xl filter brightness-[0.85] contrast-[1.1] group-hover:brightness-105 group-hover:scale-110 transition-all duration-500 will-change-transform"
                         onError={(e) => {
                             // Fallback if production image fails to load
                             (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop";
+                            // Reset styles for fallback image which usually covers full area
+                            (e.target as HTMLImageElement).className = "absolute inset-0 w-full h-full object-cover opacity-60 grayscale";
                         }}
                     />
                 </Link>
@@ -99,8 +105,8 @@ export default function ProductCard(product: ProductCardProps) {
                         onClick={handleAdd}
                         disabled={isOutOfStock}
                         className={`h-9 w-9 rounded-full flex items-center justify-center transition-all ${isOutOfStock
-                                ? 'bg-white/5 text-gray-600 cursor-not-allowed'
-                                : 'bg-white/5 border border-white/10 text-white hover:bg-primary hover:text-black hover:scale-110 active:scale-95'
+                            ? 'bg-white/5 text-gray-600 cursor-not-allowed'
+                            : 'bg-white/5 border border-white/10 text-white hover:bg-primary hover:text-black hover:scale-110 active:scale-95'
                             }`}
                     >
                         <span className="material-symbols-outlined text-[20px]">{isOutOfStock ? 'block' : 'add'}</span>

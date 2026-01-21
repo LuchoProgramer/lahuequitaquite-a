@@ -76,6 +76,25 @@ export default function ProductPage() {
             .finally(() => setLoading(false));
     }, [slug, selectedBranch]);
 
+    const jsonLd = product ? {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": product.nombre,
+        "image": getImageUrl(product.imagen || product.image),
+        "description": product.meta_descripcion || product.descripcion,
+        "brand": {
+            "@type": "Brand",
+            "name": "La Huequita Quiteña"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": `https://lahuequitaquitena.com/producto/${product.slug}`,
+            "priceCurrency": "USD",
+            "price": product.precio,
+            "availability": product.stock_total > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"
+        }
+    } : null;
+
     if (loading) return (
         <div className="min-h-screen bg-background-dark flex items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-primary"></div>
@@ -91,11 +110,18 @@ export default function ProductPage() {
 
     return (
         <div className="bg-background-dark min-h-screen pb-40">
+            {/* SEO Structured Data */}
+            {jsonLd && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                />
+            )}
             {/* Product Hero Image */}
             <div className="relative w-full h-[60vh] min-h-[400px]">
                 <div className="absolute inset-0 bg-background-dark flex items-center justify-center overflow-hidden">
                     <img
-                        src={getImageUrl(product.imagen) || "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop"}
+                        src={getImageUrl(product.imagen || product.image) || "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop"}
                         alt={product.nombre}
                         className={`w-full h-full object-cover grayscale contrast-125 ${isOutOfStock ? 'opacity-40' : ''}`}
                     />
@@ -167,29 +193,44 @@ export default function ProductPage() {
                         </div>
                     </details>
 
-                    {/* Tasting Notes (Mocked in Detail but based on real fields like meta_descripcion if available) */}
-                    <details className="flex flex-col rounded-xl border border-white/5 bg-surface-dark/30 px-5 py-2 group">
-                        <summary className="flex cursor-pointer items-center justify-between py-4 select-none">
-                            <p className="text-white text-xs font-bold uppercase tracking-[0.2em]">Notas de Cata</p>
-                            <span className="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
-                        </summary>
-                        <div className="pb-6 text-gray-400 text-sm leading-relaxed font-light">
-                            <ul className="space-y-3">
-                                <li className="flex gap-2">
-                                    <span className="text-primary font-bold">VISTA:</span>
-                                    <span className="opacity-80">Ámbar profundo con destellos cobrizos.</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span className="text-primary font-bold">NARIZ:</span>
-                                    <span className="opacity-80">Aromas complejos de frutos secos, miel y madera.</span>
-                                </li>
-                                <li className="flex gap-2">
-                                    <span className="text-primary font-bold">BOCA:</span>
-                                    <span className="opacity-80">Sedoso, con final largo y notas de chocolate amargo.</span>
-                                </li>
-                            </ul>
-                        </div>
-                    </details>
+                    {/* Meta Description / Tasting Notes */}
+                    {product.meta_descripcion && (
+                        <details className="flex flex-col rounded-xl border border-white/5 bg-surface-dark/30 px-5 py-2 group" open>
+                            <summary className="flex cursor-pointer items-center justify-between py-4 select-none">
+                                <p className="text-white text-xs font-bold uppercase tracking-[0.2em]">Notas de Cata & Detalles</p>
+                                <span className="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+                            </summary>
+                            <div className="pb-6 text-gray-400 text-sm leading-relaxed font-light whitespace-pre-line">
+                                {product.meta_descripcion}
+                            </div>
+                        </details>
+                    )}
+
+                    {/* Tasting Notes (Fallback static if no meta_descripcion but it is alcohol) */}
+                    {!product.meta_descripcion && ['RON', 'WHISKY', 'VINO', 'GIN', 'VODKA', 'TEQUILA'].includes(product.categoria_nombre.toUpperCase()) && (
+                        <details className="flex flex-col rounded-xl border border-white/5 bg-surface-dark/30 px-5 py-2 group">
+                            <summary className="flex cursor-pointer items-center justify-between py-4 select-none">
+                                <p className="text-white text-xs font-bold uppercase tracking-[0.2em]">Notas de Cata</p>
+                                <span className="material-symbols-outlined text-primary transition-transform group-open:rotate-180">expand_more</span>
+                            </summary>
+                            <div className="pb-6 text-gray-400 text-sm leading-relaxed font-light">
+                                <ul className="space-y-3">
+                                    <li className="flex gap-2">
+                                        <span className="text-primary font-bold">VISTA:</span>
+                                        <span className="opacity-80">Seleccionado por su pureza y carácter visual.</span>
+                                    </li>
+                                    <li className="flex gap-2">
+                                        <span className="text-primary font-bold">NARIZ:</span>
+                                        <span className="opacity-80">Aromas tradicionales de la región.</span>
+                                    </li>
+                                    <li className="flex gap-2">
+                                        <span className="text-primary font-bold">BOCA:</span>
+                                        <span className="opacity-80">Equilibrado, con final persistente.</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </details>
+                    )}
                 </div>
 
                 {/* Related Section (Dynamic based on Cross-selling logic) */}
@@ -200,7 +241,7 @@ export default function ProductPage() {
                             <Link href={`/producto/${item.slug}`} key={item.id} className="snap-center shrink-0 w-[180px] flex flex-col gap-3 group cursor-pointer">
                                 <div className="aspect-[4/5] rounded-xl bg-surface-dark border border-white/5 overflow-hidden">
                                     <img
-                                        src={getImageUrl(item.imagen) || "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=200&auto=format&fit=crop"}
+                                        src={getImageUrl(item.imagen || item.image) || "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?q=80&w=200&auto=format&fit=crop"}
                                         alt={item.nombre}
                                         className="w-full h-full object-cover grayscale opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all"
                                     />
@@ -255,8 +296,8 @@ export default function ProductPage() {
                         }}
                         disabled={isOutOfStock}
                         className={`w-full transition-all text-background-dark font-black text-sm uppercase tracking-[0.2em] h-16 rounded-xl flex items-center justify-center gap-3 shadow-[0_10px_30px_rgba(238,189,43,0.3)] ${isOutOfStock
-                                ? 'bg-gray-700 text-gray-500 cursor-not-allowed grayscale'
-                                : 'bg-primary hover:bg-primary/90 active:scale-[0.98]'
+                            ? 'bg-gray-700 text-gray-500 cursor-not-allowed grayscale'
+                            : 'bg-primary hover:bg-primary/90 active:scale-[0.98]'
                             }`}
                     >
                         <span className="material-symbols-outlined">{isOutOfStock ? 'block' : 'shopping_bag'}</span>

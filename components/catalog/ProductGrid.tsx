@@ -107,7 +107,7 @@ export default function ProductCatalog({ initialProducts, categories }: ProductC
                                         precio={product.precio}
                                         categoria={product.categoria_nombre}
                                         esPremium={product.es_premium}
-                                        imagen={product.imagen}
+                                        imagen={product.image || product.imagen}
                                         stock={product.stock_total}
                                     />
                                 ))}

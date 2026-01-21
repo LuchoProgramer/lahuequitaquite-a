@@ -4,10 +4,12 @@ export interface Product {
     slug: string;
     precio: string;
     descripcion: string;
-    imagen?: string;
+    image?: string; // Propiedad que viene del API
+    imagen?: string; // Propiedad legacy usada en componentes
     categoria_nombre: string;
     es_premium: boolean;
     stock_total: number;
+    meta_descripcion?: string;
     sucursal_id?: number | string;
     disponible_sucursal?: boolean;
     presentaciones?: {

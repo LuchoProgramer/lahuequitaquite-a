@@ -1,7 +1,11 @@
 import { HomeData, Product, Sucursal } from "./types";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://api.ledgerxpertz.com/api";
-const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID || "la_huequita";
+const TENANT_ID = process.env.NEXT_PUBLIC_TENANT_ID;
+
+if (!TENANT_ID) {
+    throw new Error("FATAL: NEXT_PUBLIC_TENANT_ID environment variable is not defined. Please configure it in .env.local or Vercel.");
+}
 
 const headers = {
     "X-Tenant": TENANT_ID,
@@ -31,7 +35,10 @@ export async function fetchHomeData(sucursalId?: number | string): Promise<HomeD
     const url = sucursalId ? `${API_URL}/tienda/home/?sucursal=${sucursalId}` : `${API_URL}/tienda/home/`;
     const res = await fetch(url, {
         headers,
-        cache: 'no-store',
+        next: {
+            revalidate: 60,
+            tags: ['home']
+        }
     });
     if (!res.ok) throw new Error("Failed to fetch home data");
     return res.json();
@@ -45,7 +52,10 @@ export async function fetchProducts(search?: string, categoria?: string, sucursa
 
     const res = await fetch(`${API_URL}/tienda/productos/?${params.toString()}`, {
         headers,
-        cache: 'no-store',
+        next: {
+            revalidate: 60,
+            tags: ['products']
+        }
     });
     return res.json();
 }
@@ -54,7 +64,10 @@ export async function fetchProductBySlug(slug: string, sucursalId?: number | str
     const url = sucursalId ? `${API_URL}/tienda/producto/${slug}/?sucursal=${sucursalId}` : `${API_URL}/tienda/producto/${slug}/`;
     const res = await fetch(url, {
         headers,
-        cache: 'no-store',
+        next: {
+            revalidate: 60,
+            tags: [`product-${slug}`]
+        }
     });
     if (!res.ok) throw new Error("Product not found");
     return res.json();
