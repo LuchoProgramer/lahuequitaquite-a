@@ -145,11 +145,15 @@ REVALIDATION_SECRET=OTqOn8R7t3N8jhKxKNGV4HBFUSVfvlcckpyPQNg0Pa0
 - ✅ Integración completa con LedgerXpertz API
 
 ### Backend (LedgerXpertz)
-- ✅ API REST con Django
-- ✅ Multi-tenancy con PostgreSQL schemas
-- ✅ Endpoints públicos para tienda
+- ✅ API REST con Django REST Framework
+- ✅ Multi-tenancy con django-tenants (PostgreSQL schemas)
+- ✅ Endpoints públicos para tienda (`core/api_publico.py`)
+- ✅ Feed XML para Google Merchant Center (`core/api_google_merchant.py`)
+- ✅ Universal Commerce Protocol (UCP) implementado (`ucp/`)
 - ✅ Gestión de inventario en tiempo real
-- ✅ Sistema de sucursales
+- ✅ Sistema de sucursales con geolocalización
+- ✅ Facturación electrónica SRI (Ecuador)
+- ✅ Punto de Venta (POS)
 - ✅ CORS configurado
 
 ---

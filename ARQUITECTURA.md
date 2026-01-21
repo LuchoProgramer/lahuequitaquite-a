@@ -22,10 +22,12 @@ Lenguaje: TypeScript 5
 ### Backend (LedgerXpertz)
 ```
 Tecnología: Django 4.x (Multi-Tenant)
+Framework: Django REST Framework
 Base de Datos: PostgreSQL (Schemas por tenant)
-API: Django REST Framework
+Multi-tenancy: django-tenants
 Hosting: https://api.ledgerxpertz.com
 Tenant ID: la_huequita
+Python: 3.12+
 ```
 
 ---
@@ -51,20 +53,26 @@ Tenant ID: la_huequita
                      │ Header: X-Tenant: la_huequita
                      ↓
 ┌─────────────────────────────────────────────────────────┐
-│  BACKEND - Django Multi-Tenant                          │
+│  BACKEND - Django Multi-Tenant (LedgerXpertz)           │
 │  - URL: https://api.ledgerxpertz.com                    │
 │  - Endpoints públicos: /api/tienda/*                    │
+│  - Endpoints privados: /api/auth/* (requieren login)    │
+│  - Google Merchant Feed: /api/google-merchant/feed.xml  │
+│  - Universal Commerce Protocol: /api/ucp/*              │
 │  - Gestión de inventario en tiempo real                 │
-│  - Sistema de sucursales                                │
-│  - Integración con Uber Eats (futuro)                   │
+│  - Sistema de sucursales con geolocalización            │
+│  - Facturación electrónica SRI (Ecuador)                │
 └────────────────────┬────────────────────────────────────┘
                      │
                      ↓
 ┌─────────────────────────────────────────────────────────┐
 │  BASE DE DATOS - PostgreSQL                             │
-│  - Schema: la_huequita                                  │
-│  - Productos, Stock, Precios, Sucursales                │
-│  - Categorías, Presentaciones                           │
+│  - Schema compartido: public (empresas, dominios)       │
+│  - Schema tenant: la_huequita                           │
+│    * Productos, Stock, Precios, Sucursales              │
+│    * Categorías, Presentaciones, Inventarios            │
+│    * Facturas, Ventas, Compras                          │
+│    * Usuarios, Turnos, Auditorías                       │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -81,7 +89,9 @@ Next.js Server Component hace fetch a:
     https://api.ledgerxpertz.com/api/tienda/productos/
     Headers: { "X-Tenant": "la_huequita" }
     ↓
-Django identifica el tenant y consulta schema la_huequita
+Django TenantMiddleware identifica el tenant
+    ↓
+Cambia conexión a schema: la_huequita
     ↓
 PostgreSQL retorna productos con stock en tiempo real
     ↓
@@ -128,13 +138,22 @@ Acceso permitido al catálogo
 
 ### Endpoints Públicos (Sin autenticación)
 
-| Endpoint | Método | Descripción |
-|----------|--------|-------------|
-| `/api/tienda/sucursales/` | GET | Lista de sucursales |
-| `/api/tienda/home/` | GET | Datos de la home (categorías, destacados) |
-| `/api/tienda/productos/` | GET | Catálogo completo con filtros |
-| `/api/tienda/producto/{slug}/` | GET | Detalle de un producto |
-| `/api/tienda/stock/` | GET | Consulta de stock por sucursal |
+| Endpoint | Método | Descripción | Archivo Backend |
+|----------|--------|-------------|-----------------|
+| `/api/tienda/sucursales/` | GET | Lista de sucursales | `core/api_publico.py` |
+| `/api/tienda/home/` | GET | Datos de la home (categorías, destacados) | `core/api_publico.py` |
+| `/api/tienda/productos/` | GET | Catálogo completo con filtros | `core/api_publico.py` |
+| `/api/tienda/producto/<slug>/` | GET | Detalle de un producto | `core/api_publico.py` |
+| `/api/tienda/inventario/<id>/` | GET | Stock en tiempo real por sucursal | `core/api_publico.py` |
+| `/api/google-merchant/feed.xml` | GET | Feed XML para Google Merchant Center | `core/api_google_merchant.py` |
+
+### Endpoints UCP (Universal Commerce Protocol)
+
+| Endpoint | Método | Descripción | Archivo Backend |
+|----------|--------|-------------|-----------------|
+| `/api/ucp/catalog/` | GET | Catálogo para IA (Gemini/ChatGPT) | `ucp/views.py` |
+| `/api/ucp/negotiate/` | POST | Negociación de precios/descuentos | `ucp/views.py` |
+| `/api/ucp/execute/` | POST | Ejecutar compra desde IA | `ucp/views.py` |
 
 ### Parámetros de Query
 
@@ -154,46 +173,76 @@ GET /api/tienda/productos/?search=amarillo&categoria=aguardiente&sucursal=1
 
 ---
 
-## Modelo de Datos (Simplificado)
+## Modelo de Datos (Backend)
 
 ### Producto
-```typescript
-{
-  id: number;
-  nombre: string;
-  slug: string;
-  precio: string;
-  descripcion: string;
-  image: string;
-  categoria_nombre: string;
-  es_premium: boolean;
-  stock_total: number;
-  meta_descripcion?: string;
-  presentaciones?: Presentacion[];
-}
+```python
+class Producto(models.Model):
+    # Campos básicos
+    empresa = ForeignKey(Empresa)
+    tipo = CharField(choices=['producto', 'servicio'])
+    nombre = CharField(max_length=200)
+    descripcion = TextField()
+    categoria = ForeignKey(Categoria)
+    codigo_producto = CharField(max_length=50)
+    impuesto = ForeignKey(Impuesto)
+    image = ImageField(upload_to='productos/')
+    stock_minimo = IntegerField(default=0)
+    activo = BooleanField(default=True)
+    
+    # Google Merchant Center
+    gtin = CharField(max_length=14)  # Código de barras
+    marca = CharField(max_length=100)
+    abv = DecimalField()  # Grado alcohólico
+    
+    # E-commerce
+    slug = SlugField()  # URL amigable
+    mostrar_en_web = BooleanField(default=False)
+    es_premium = BooleanField(default=False)
+    meta_descripcion = TextField()  # SEO
 ```
 
 ### Sucursal
-```typescript
-{
-  id: number;
-  nombre: string;
-  direccion?: string;
-  telefono?: string;
-  es_principal: boolean;
-  lat?: number;
-  lng?: number;
-}
+```python
+class Sucursal(models.Model):
+    nombre = CharField(max_length=200)
+    empresa = ForeignKey(Empresa)
+    direccion = TextField()
+    telefono = CharField(max_length=20)
+    codigo_establecimiento = CharField(max_length=3)
+    punto_emision = CharField(max_length=3)
+    es_matriz = BooleanField(default=False)
+    
+    # Geolocalización
+    latitud = DecimalField(max_digits=11, decimal_places=7)
+    longitud = DecimalField(max_digits=11, decimal_places=7)
+    mostrar_en_mapa = BooleanField(default=False)
 ```
 
 ### Presentacion
-```typescript
-{
-  id: number;
-  nombre_presentacion: string;
-  cantidad: number;
-  precio: string;
-}
+```python
+class Presentacion(models.Model):
+    producto = ForeignKey(Producto)
+    nombre_presentacion = CharField(max_length=50)
+    cantidad = PositiveIntegerField()
+    precio = DecimalField(max_digits=10, decimal_places=2)
+    canal = CharField(choices=[
+        ('LOCAL', 'Venta Local / POS'),
+        ('UBER', 'Uber Eats'),
+        ('RAPPI', 'Rappi'),
+        ('WEB', 'Tienda Online'),
+    ])
+    porcentaje_adicional = DecimalField()  # Para delivery
+    sucursal = ForeignKey(Sucursal)
+```
+
+### Inventario
+```python
+class Inventario(models.Model):
+    producto = ForeignKey(Producto)
+    sucursal = ForeignKey(Sucursal)
+    cantidad = IntegerField()
+    # ... otros campos de auditoría
 ```
 
 ---
@@ -210,13 +259,13 @@ CREATE SCHEMA la_huequita;
 CREATE SCHEMA otro_cliente;
 
 -- Las tablas se replican en cada schema
-la_huequita.productos
-la_huequita.inventarios
-la_huequita.sucursales
+la_huequita.core_producto
+la_huequita.inventarios_inventario
+la_huequita.core_sucursal
 
-otro_cliente.productos
-otro_cliente.inventarios
-otro_cliente.sucursales
+otro_cliente.core_producto
+otro_cliente.inventarios_inventario
+otro_cliente.core_sucursal
 ```
 
 ### Identificación del Tenant
@@ -229,6 +278,17 @@ const headers = {
     "X-Tenant": "la_huequita",  // Desde .env.local
     "Content-Type": "application/json",
 };
+```
+
+El backend usa `TenantMiddleware` para cambiar automáticamente el schema:
+
+```python
+# LedgerXpertz/middleware.py
+class TenantMiddleware:
+    def process_request(self, request):
+        tenant_id = request.META.get('HTTP_X_TENANT')
+        tenant = Empresa.objects.get(schema_name=tenant_id)
+        connection.set_tenant(tenant)  # Cambia a schema la_huequita
 ```
 
 ---
@@ -251,27 +311,35 @@ NEXT_PUBLIC_SITE_URL=https://tudominio.com
 REVALIDATION_SECRET=OTqOn8R7t3N8jhKxKNGV4HBFUSVfvlcckpyPQNg0Pa0
 ```
 
-### Backend (Django settings.py)
+### Backend (Django .env)
 
-```python
-# CORS para permitir peticiones desde el frontend
-CORS_ALLOWED_ORIGINS = [
-    "https://tudominio.com",
-    "https://www.tudominio.com",
-]
-
-# Tenant middleware
-MIDDLEWARE = [
-    'django_tenants.middleware.main.TenantMainMiddleware',
-    # ... otros middlewares
-]
+```bash
+DEBUG=False
+SECRET_KEY=tu-secret-key
+DATABASE_URL=postgresql://usuario:password@localhost:5432/ledgerxpertz_db
+ALLOWED_HOSTS=api.ledgerxpertz.com,.localhost
+CORS_ALLOWED_ORIGINS=https://tudominio.com,https://www.tudominio.com
 ```
 
 ---
 
 ## Características Implementadas
 
-### ✅ Funcionalidades Actuales
+### ✅ Backend (LedgerXpertz)
+
+- [x] Multi-tenancy con django-tenants
+- [x] API pública para e-commerce (`api_publico.py`)
+- [x] Feed XML para Google Merchant Center (`api_google_merchant.py`)
+- [x] Universal Commerce Protocol (UCP) básico
+- [x] Gestión de inventario en tiempo real
+- [x] Sistema de sucursales con geolocalización
+- [x] Facturación electrónica SRI (Ecuador)
+- [x] Autenticación con sesiones y JWT
+- [x] Roles y permisos (Admin/Vendedor)
+- [x] Punto de Venta (POS)
+- [x] Reportes y dashboards
+
+### ✅ Frontend (La Huequita Web)
 
 - [x] Age Gate (verificación de edad +18)
 - [x] Catálogo de productos con filtros
@@ -282,9 +350,9 @@ MIDDLEWARE = [
 - [x] Páginas legales (términos, privacidad, políticas)
 - [x] Feed XML para Google Merchant Center
 - [x] SEO optimizado con metadata
-- [x] Integración con LedgerXpertz API
+- [x] Integración completa con LedgerXpertz API
 
-### ⚠️ Pendientes (Según FEEDBACK.md)
+### ⚠️ Pendientes
 
 - [ ] Checkout completo
 - [ ] Integración de pagos
@@ -299,20 +367,25 @@ MIDDLEWARE = [
 
 ## Integraciones Planificadas
 
-### 1. Google Merchant Center
-- Feed XML automático
+### 1. Google Merchant Center ✅ (Backend listo)
+- Feed XML automático implementado
+- Mapeo de categorías a IDs de Google
 - Productos con atributos para alcohol
-- Actualización diaria
+- Filtrado de productos prohibidos (tabaco)
+- **Archivo**: `core/api_google_merchant.py`
 
-### 2. Uber Eats (Ver UBER_EATS_INTEGRATION.md)
+### 2. Uber Eats (Planificado)
 - Sincronización de menú
-- Precios diferenciados (precio_delivery)
+- Precios diferenciados (campo `canal` en Presentacion)
 - Gestión de pedidos
+- **Documentación**: `UBER_EATS_INTEGRATION.md`
 
-### 3. Universal Commerce Protocol (Ver UNIVERSAL_COMMERCE_PROTOCOL.md)
+### 3. Universal Commerce Protocol ✅ (Implementado)
 - Compras desde Gemini/ChatGPT
 - Ofertas dinámicas
 - Negociación automática
+- **Directorio**: `ucp/`
+- **Documentación**: `UNIVERSAL_COMMERCE_PROTOCOL.md`
 
 ---
 
@@ -326,7 +399,7 @@ MIDDLEWARE = [
 
 ### Precios (PRICING_STRATEGY_DELIVERY.md)
 - Precios diferenciados por plataforma
-- Campo `precio_delivery` para Uber Eats
+- Campo `canal` en Presentacion
 - Compensación de comisiones
 
 ### Alcohol (MERCHANT_CENTER_ALCOHOL_REQUIREMENTS.md)
@@ -338,11 +411,11 @@ MIDDLEWARE = [
 
 ## Roadmap
 
-### Fase 1: Lanzamiento Beta (2 semanas)
-1. Configurar dominio custom
-2. Deploy a Vercel
-3. Configurar Google Merchant Center
-4. Implementar checkout básico
+### Fase 1: Lanzamiento Beta (2 semanas) ✅ 70% Completado
+1. ✅ Configurar dominio custom
+2. ✅ Deploy a Vercel
+3. ⚠️ Configurar Google Merchant Center
+4. ❌ Implementar checkout básico
 
 ### Fase 2: E-commerce Completo (1 mes)
 1. Integración de pagos
@@ -352,7 +425,7 @@ MIDDLEWARE = [
 
 ### Fase 3: Expansión (3 meses)
 1. Integración Uber Eats
-2. Universal Commerce Protocol
+2. Universal Commerce Protocol en producción
 3. Múltiples tenants
 4. Dashboard de métricas
 
@@ -365,22 +438,61 @@ MIDDLEWARE = [
 | Competencia | La Huequita (LedgerXpertz) |
 |-------------|----------------------------|
 | Sin sitio web | ✅ E-commerce completo |
-| Inventario manual | ✅ Tiempo real |
-| Sin Google Shopping | ✅ Merchant Center |
+| Inventario manual | ✅ Tiempo real con PostgreSQL |
+| Sin Google Shopping | ✅ Feed XML automático |
 | Imágenes genéricas | ✅ Fotografía profesional |
 | "Llamar para stock" | ✅ Stock visible online |
+| Sin facturación electrónica | ✅ Integración SRI Ecuador |
 
 ### Tecnología
 
 - **Multi-tenant**: Un código, múltiples clientes
 - **Escalable**: Arquitectura moderna (Next.js + Django)
-- **AI-Ready**: Preparado para UCP
+- **AI-Ready**: UCP implementado
 - **SEO-First**: Optimizado desde el inicio
+- **Compliance**: Facturación electrónica SRI
+
+---
+
+## Estructura del Backend (LedgerXpertz)
+
+```
+LedgerXpertz/
+├── core/                           # Modelos base y API
+│   ├── models.py                   # Producto, Sucursal, Presentacion
+│   ├── api_publico.py              # API pública para e-commerce
+│   ├── api_google_merchant.py      # Feed XML para Google
+│   ├── api_productos.py            # CRUD de productos (privado)
+│   ├── api_inventario.py           # Gestión de inventario
+│   └── api_urls.py                 # Rutas de la API
+│
+├── empresas/                       # Multi-tenancy
+│   ├── models.py                   # Empresa, Dominio
+│   └── middleware.py               # TenantMiddleware
+│
+├── inventarios/                    # Inventario
+│   ├── models.py                   # Inventario, Movimiento
+│   └── api.py                      # API de inventario
+│
+├── facturacion/                    # Facturación SRI
+│   ├── models.py                   # Factura, NotaCredito
+│   └── api.py                      # API de facturación
+│
+├── ventas/                         # Punto de Venta
+│   ├── models.py                   # Venta, DetalleVenta
+│   └── api.py                      # API de ventas
+│
+└── ucp/                            # Universal Commerce Protocol
+    ├── models.py                   # Modelos UCP
+    ├── views.py                    # Endpoints UCP
+    └── urls.py                     # Rutas UCP
+```
 
 ---
 
 ## Recursos Adicionales
 
+### Documentación del Proyecto
 - **FEEDBACK.md**: Review completo del sistema
 - **SEO_STRATEGY.md**: Estrategia SEO 100%
 - **UBER_EATS_INTEGRATION.md**: Integración con Uber Eats
@@ -390,8 +502,14 @@ MIDDLEWARE = [
 - **DEPLOY_VERCEL.md**: Guía de deployment
 - **SETUP_DOMINIO_Y_MERCHANT_CENTER.md**: Configuración completa
 
+### Documentación del Backend
+- **README_DEV.md**: Guía de desarrollo
+- **ROADMAP_ECOMMERCE.md**: Roadmap de e-commerce
+- **MANUAL_USUARIO.md**: Manual de usuario
+
 ---
 
 **Última actualización:** Enero 2026  
-**Versión:** 1.0  
-**Proyecto:** La Huequita Web (Piloto LedgerXpertz E-commerce)
+**Versión:** 2.0  
+**Proyecto:** La Huequita Web (Piloto LedgerXpertz E-commerce)  
+**Backend:** LedgerXpertz Multi-Tenant System
