@@ -23,7 +23,7 @@ export async function GET() {
 
     const response = await fetch(backendFeedUrl, {
       headers: {
-        'X-Tenant': process.env.NEXT_PUBLIC_TENANT_ID || '',
+        'X-Tenant': process.env.NEXT_PUBLIC_TENANT_ID || 'la_huequita',
       },
       // Revalidar cada hora (Google Merchant Center consulta cada 24h)
       next: { revalidate: 3600 },
