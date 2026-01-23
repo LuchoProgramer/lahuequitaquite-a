@@ -53,7 +53,7 @@ export default function ProductCard(product: ProductCardProps) {
                 {/* Spotlight Gradient */}
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-500/10 via-transparent to-transparent opacity-60 group-hover:opacity-100 transition-opacity duration-700"></div>
 
-                <Link href={`/producto/${slug}`} className="absolute inset-0 p-6 flex items-center justify-center">
+                <Link href={`/productos/${slug}`} className="absolute inset-0 p-6 flex items-center justify-center">
                     <img
                         src={getImageUrl(imagen) || "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop"}
                         alt={nombre}
@@ -91,7 +91,7 @@ export default function ProductCard(product: ProductCardProps) {
             {/* Info Section */}
             <div className="p-4 flex flex-col gap-1">
                 <div className="flex justify-between items-start">
-                    <Link href={`/producto/${slug}`} className="flex-grow">
+                    <Link href={`/productos/${slug}`} className="flex-grow">
                         <h4 className="text-white font-bold text-sm leading-snug uppercase tracking-tight group-hover:text-primary transition-colors">{nombre}</h4>
                         <p className="text-white/40 text-[10px] font-medium uppercase tracking-widest mt-0.5">{categoria}</p>
                     </Link>

@@ -60,7 +60,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             const productos = data.data || []
 
             productPages = productos.map((producto: any) => ({
-                url: `${baseUrl}/producto/${producto.slug}`,
+                url: `${baseUrl}/productos/${producto.slug}`,
                 lastModified: new Date(producto.updated_at || new Date()),
                 changeFrequency: 'daily' as const,
                 priority: producto.es_premium ? 0.8 : 0.7,
