@@ -56,9 +56,14 @@ export default function Footer() {
                     <p className="text-[9px] text-gray-600 uppercase tracking-[0.4em]">
                         &copy; {new Date().getFullYear()} La Huequita Quiteña. Todos los derechos reservados.
                     </p>
-                    <div className="flex items-center gap-2 text-[8px] text-gray-600 uppercase tracking-widest opacity-60 text-center">
-                        <span className="material-symbols-outlined text-xs">warning</span>
-                        <span>PROHIBIDA LA VENTA A MENORES DE 18 AÑOS. BEBER CON MODERACIÓN.</span>
+                    <div className="flex flex-col items-center gap-2 text-center">
+                        <div className="flex items-center gap-2 text-[9px] text-gray-500 uppercase tracking-widest">
+                            <span className="material-symbols-outlined text-sm text-amber-500">warning</span>
+                            <span className="font-bold">Venta Prohibida a Menores de 18 Años</span>
+                        </div>
+                        <p className="text-[8px] text-gray-600 uppercase tracking-wider max-w-md">
+                            El consumo excesivo de alcohol es perjudicial para la salud. Beba con moderación.
+                        </p>
                     </div>
                 </div>
             </div>
