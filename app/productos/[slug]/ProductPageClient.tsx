@@ -21,6 +21,7 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
     const [product, setProduct] = useState<Product | null>(initialProduct);
     const [loading, setLoading] = useState(!initialProduct);
     const [suggestions, setSuggestions] = useState<Product[]>([]);
+    const [defaultSuggestions, setDefaultSuggestions] = useState<Product[]>([]);
     const [quantity, setQuantity] = useState(1);
     const [searchTerm, setSearchTerm] = useState("");
     const [isSearching, setIsSearching] = useState(false);
@@ -34,7 +35,10 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
 
     // --- LÓGICA DE BÚSQUEDA RÁPIDA (DEBOUNCED) ---
     useEffect(() => {
-        if (!searchTerm.trim()) return;
+        if (!searchTerm.trim()) {
+            setSuggestions(defaultSuggestions);
+            return;
+        }
 
         const delayDebounceFn = setTimeout(() => {
             setIsSearching(true);
@@ -43,10 +47,10 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                     setSuggestions(res.data.slice(0, 10));
                 })
                 .finally(() => setIsSearching(false));
-        }, 500);
+        }, 400); // Slightly faster debounce for better feel
 
         return () => clearTimeout(delayDebounceFn);
-    }, [searchTerm, selectedBranch]);
+    }, [searchTerm, selectedBranch, defaultSuggestions]);
 
     useEffect(() => {
         if (initialProduct && !selectedBranch) {
@@ -96,7 +100,9 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                         const filtered = allExtras.filter(p => p.id !== res.data.id);
 
                         // Mezclar aleatoriamente para variedad
-                        setSuggestions(filtered.sort(() => 0.5 - Math.random()).slice(0, 8));
+                        const final = filtered.sort(() => 0.5 - Math.random()).slice(0, 8);
+                        setDefaultSuggestions(final);
+                        setSuggestions(final);
                     });
                 } else {
                     Promise.all([
@@ -108,13 +114,15 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                             ...(bebidas.data || [])
                         ].filter(p => p.id !== res.data.id && p.slug !== slug);
 
-                        setSuggestions(safeSuggestions.sort(() => 0.5 - Math.random()).slice(0, 6));
+                        const final = safeSuggestions.sort(() => 0.5 - Math.random()).slice(0, 6);
+                        setDefaultSuggestions(final);
+                        setSuggestions(final);
                     });
                 }
             })
             .catch(err => console.error(err))
             .finally(() => setLoading(false));
-    }, [slug, selectedBranch, initialProduct, searchTerm === ""]); // Reset when search cleared
+    }, [slug, selectedBranch, initialProduct]); // CLEANED DEPENDENCIES: No more searchTerm here
 
     const addToCart = () => {
         if (!product || isOutOfStock) return;
@@ -241,32 +249,36 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                         </div>
 
                         {/* --- CROSS SELLING: "EL TOQUE FINAL" --- */}
-                        {suggestions.length > 0 && (
-                            <div className="border-t border-white/10 pt-10 mb-32">
-                                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
-                                    <div className="flex flex-col gap-1">
-                                        <h4 className="font-display text-3xl italic text-zinc-200">El Toque Final</h4>
-                                        <p className="text-[10px] text-zinc-500 uppercase tracking-[0.2em]">Completa tu orden sin salir de aquí</p>
-                                    </div>
-
-                                    {/* Quick Search Input */}
-                                    <div className="relative w-full md:w-64 group">
-                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-zinc-500 group-focus-within:text-primary transition-colors text-lg">search</span>
-                                        <input
-                                            type="text"
-                                            placeholder="Buscar hielo, cola, snacks..."
-                                            value={searchTerm}
-                                            onChange={(e) => setSearchTerm(e.target.value)}
-                                            className="w-full bg-white/[0.03] border border-white/10 rounded-full py-3 pl-11 pr-4 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] transition-all"
-                                        />
-                                        {isSearching && (
-                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
-                                        )}
-                                    </div>
+                        <div className="border-t border-white/10 pt-10 mb-32">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+                                <div className="flex flex-col gap-1">
+                                    <h4 className="font-display text-3xl italic text-zinc-200">El Toque Final</h4>
+                                    <p className="text-[10px] text-zinc-500 uppercase tracking-[0.2em]">Completa tu orden sin salir de aquí</p>
                                 </div>
 
-                                <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 scrollbar-hide snap-x snap-mandatory">
-                                    {suggestions.map((item) => (
+                                {/* Quick Search Input */}
+                                <div className="relative w-full md:w-64 group">
+                                    <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-zinc-500 group-focus-within:text-primary transition-colors text-lg">search</span>
+                                    <input
+                                        type="text"
+                                        placeholder="Buscar hielo, cola, snacks..."
+                                        value={searchTerm}
+                                        onChange={(e) => setSearchTerm(e.target.value)}
+                                        className="w-full bg-white/[0.03] border border-white/10 rounded-full py-3 pl-11 pr-4 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] transition-all"
+                                    />
+                                    {isSearching && (
+                                        <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                                    )}
+                                </div>
+                            </div>
+
+                            <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 scrollbar-hide snap-x snap-mandatory min-h-[140px]">
+                                {isSearching ? (
+                                    <div className="w-full flex items-center justify-center py-10">
+                                        <div className="w-6 h-6 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                                    </div>
+                                ) : suggestions.length > 0 ? (
+                                    suggestions.map((item) => (
                                         <div key={item.id} className="min-w-[160px] md:min-w-[200px] snap-start group relative">
                                             <Link href={`/productos/${item.slug}`} className="block">
                                                 <div className="aspect-square bg-white/[0.03] rounded-xl mb-3 overflow-hidden relative border border-white/5">
@@ -291,10 +303,15 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                                                 <span className="material-symbols-outlined text-xl">add</span>
                                             </button>
                                         </div>
-                                    ))}
-                                </div>
+                                    ))
+                                ) : (
+                                    <div className="w-full flex flex-col items-center justify-center py-10 text-zinc-500 gap-2">
+                                        <span className="material-symbols-outlined text-3xl opacity-20">search_off</span>
+                                        <p className="text-[10px] uppercase tracking-widest">No encontramos resultados para su búsqueda</p>
+                                    </div>
+                                )}
                             </div>
-                        )}
+                        </div>
 
                     </motion.div>
                 </div>
