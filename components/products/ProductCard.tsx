@@ -59,10 +59,16 @@ export default function ProductCard(product: ProductCardProps) {
                         alt={nombre}
                         className="w-full h-full object-contain drop-shadow-2xl filter brightness-[0.85] contrast-[1.1] group-hover:brightness-105 group-hover:scale-110 transition-all duration-500 will-change-transform"
                         onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            const fallbackUrl = "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop";
+
+                            // Prevent infinite loop: if already using fallback, do nothing
+                            if (target.src === fallbackUrl) return;
+
                             // Fallback if production image fails to load
-                            (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop";
+                            target.src = fallbackUrl;
                             // Reset styles for fallback image which usually covers full area
-                            (e.target as HTMLImageElement).className = "absolute inset-0 w-full h-full object-cover opacity-60 grayscale";
+                            target.className = "absolute inset-0 w-full h-full object-cover opacity-60 grayscale";
                         }}
                     />
                 </Link>
