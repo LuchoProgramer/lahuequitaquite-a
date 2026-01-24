@@ -25,8 +25,8 @@ export async function GET() {
       headers: {
         'X-Tenant': process.env.NEXT_PUBLIC_TENANT_ID || 'la_huequita',
       },
-      // Revalidar cada hora (Google Merchant Center consulta cada 24h)
-      next: { revalidate: 3600 },
+      // Desactivar caché temporalmente para debugging
+      next: { revalidate: 0 },
     });
 
     if (!response.ok) {
