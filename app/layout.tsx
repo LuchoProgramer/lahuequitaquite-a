@@ -47,6 +47,11 @@ export const metadata: Metadata = {
     description: "Licores originales a domicilio en Quito.",
     images: ["/logo-icon.png"],
   },
+  icons: {
+    icon: "/logo-icon.png",
+    shortcut: "/logo-icon.png",
+    apple: "/logo-icon.png",
+  },
 };
 
 import AgeGate from "@/components/AgeGate";
