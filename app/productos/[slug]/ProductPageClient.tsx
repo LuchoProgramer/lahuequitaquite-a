@@ -227,23 +227,38 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
 
                         {/* --- CROSS SELLING: "THE FINISHING TOUCH" --- */}
                         {suggestions.length > 0 && (
-                            <div className="border-t border-white/10 pt-10">
-                                <h4 className="font-display text-2xl italic text-zinc-500 mb-6">The Finishing Touch</h4>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <div className="border-t border-white/10 pt-10 mb-32">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h4 className="font-display text-2xl italic text-zinc-400">The Finishing Touch</h4>
+                                    <span className="text-[10px] text-zinc-600 uppercase tracking-widest animate-pulse">Desliza para más →</span>
+                                </div>
+
+                                <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 scrollbar-hide snap-x snap-mandatory">
                                     {suggestions.map((item) => (
-                                        <Link href={`/productos/${item.slug}`} key={item.id} className="group cursor-pointer">
-                                            <div className="aspect-square bg-white/[0.03] rounded-sm mb-3 overflow-hidden relative">
-                                                <img
-                                                    src={getImageUrl(item.imagen || item.image) || "/placeholder.jpg"}
-                                                    className="w-full h-full object-cover opacity-60 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 transform group-hover:scale-110"
-                                                    alt={item.nombre}
-                                                />
-                                                <div className="absolute inset-x-0 bottom-0 p-2 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    <p className="text-[10px] text-[#D4AF37] text-center font-bold tracking-widest">AGREGAR</p>
+                                        <div key={item.id} className="min-w-[160px] md:min-w-[200px] snap-start group relative">
+                                            <Link href={`/productos/${item.slug}`} className="block">
+                                                <div className="aspect-square bg-white/[0.03] rounded-xl mb-3 overflow-hidden relative border border-white/5">
+                                                    <img
+                                                        src={getImageUrl(item.imagen || item.image) || "/placeholder.jpg"}
+                                                        className="w-full h-full object-contain p-4 opacity-70 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                                                        alt={item.nombre}
+                                                    />
                                                 </div>
-                                            </div>
-                                            <p className="text-xs text-zinc-400 uppercase tracking-wide truncate group-hover:text-white transition-colors">{item.nombre}</p>
-                                        </Link>
+                                                <h5 className="text-[11px] text-zinc-400 uppercase tracking-wide truncate pr-8">{item.name || item.nombre}</h5>
+                                                <p className="text-sm font-bold text-white mt-1">${item.precio}</p>
+                                            </Link>
+
+                                            {/* Quick Add Button */}
+                                            <button
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    addItem(item);
+                                                }}
+                                                className="absolute bottom-6 right-0 w-10 h-10 bg-primary/10 hover:bg-primary border border-primary/20 hover:border-primary rounded-full flex items-center justify-center text-primary hover:text-black transition-all duration-300 shadow-lg active:scale-90 z-20"
+                                            >
+                                                <span className="material-symbols-outlined text-xl">add</span>
+                                            </button>
+                                        </div>
                                     ))}
                                 </div>
                             </div>

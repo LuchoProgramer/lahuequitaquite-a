@@ -18,6 +18,10 @@ export default function BottomNav() {
         { name: "Cuenta", icon: "person", href: "/perfil" },
     ];
 
+    const isProductPage = pathname.startsWith("/productos/") && pathname.split("/").length > 2;
+
+    if (isProductPage) return null;
+
     return (
         <nav className="md:hidden fixed bottom-0 left-0 w-full glass-nav border-t border-white/5 pb-8 pt-3 z-50 px-4">
             <div className="flex justify-around items-center max-w-lg mx-auto">
