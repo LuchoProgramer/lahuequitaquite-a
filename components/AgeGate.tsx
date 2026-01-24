@@ -92,7 +92,16 @@ export default function AgeGate({ children }: { children: React.ReactNode }) {
           Si no está verificado, el modal está encima, pero para SEO y Merchant Center
           el contenido debe estar presente pero inaccesible.
       */}
-            <div className={!verified ? "hidden" : ""}>
+            {/* 
+                SEO & Google Bot Friendly:
+                El contenido SIEMPRE se renderiza en el DOM para que los bots puedan leerlo.
+                El modal se superpone visualmente (z-index alto).
+                Usamos aria-hidden y inert (si fuera soportado) para accesibilidad.
+            */}
+            <div
+                aria-hidden={!verified}
+                className={!verified ? "h-screen overflow-hidden filter blur-sm select-none" : ""}
+            >
                 {children}
             </div>
         </>
