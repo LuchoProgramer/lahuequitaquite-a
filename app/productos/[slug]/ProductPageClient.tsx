@@ -22,6 +22,8 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
     const [loading, setLoading] = useState(!initialProduct);
     const [suggestions, setSuggestions] = useState<Product[]>([]);
     const [quantity, setQuantity] = useState(1);
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
 
     // Scroll progress for visuals
     const { scrollY } = useScroll();
@@ -29,6 +31,22 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
     const heroScale = useTransform(scrollY, [0, 500], [1, 1.1]);
 
     const isOutOfStock = product ? product.stock_total <= 0 : false;
+
+    // --- LÓGICA DE BÚSQUEDA RÁPIDA (DEBOUNCED) ---
+    useEffect(() => {
+        if (!searchTerm.trim()) return;
+
+        const delayDebounceFn = setTimeout(() => {
+            setIsSearching(true);
+            fetchProducts(searchTerm, undefined, selectedBranch?.id)
+                .then(res => {
+                    setSuggestions(res.data.slice(0, 10));
+                })
+                .finally(() => setIsSearching(false));
+        }, 500);
+
+        return () => clearTimeout(delayDebounceFn);
+    }, [searchTerm, selectedBranch]);
 
     useEffect(() => {
         if (initialProduct && !selectedBranch) {
@@ -42,7 +60,7 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
             .then(res => {
                 setProduct(res.data);
 
-                // --- LÓGICA DE "THE FINISHING TOUCH" (CROSS-SELLING) ---
+                // --- LÓGICA DE "EL TOQUE FINAL" (CROSS-SELLING) ---
                 // Estrategia: "Lista Segura". Si el producto es Alcohol, SOLO mostramos complementos.
                 // Categorías de Alcohol conocidas
                 const alcoholCategories = ['RON', 'WHISKY', 'CERVEZA', 'AGUARDIENTE', 'ZHUMIR', 'VINO', 'CHAMPAGNE', 'GIN', 'VODKA', 'TEQUILA', 'LICOR', 'VARIOS'];
@@ -74,16 +92,13 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                             ...(noAlcohol.data || [])
                         ];
 
-                        // Verificar que no sugerimos el mismo producto (aunque improbable aqui)
+                        // Verificar que no sugerimos el mismo producto
                         const filtered = allExtras.filter(p => p.id !== res.data.id);
 
                         // Mezclar aleatoriamente para variedad
                         setSuggestions(filtered.sort(() => 0.5 - Math.random()).slice(0, 8));
                     });
                 } else {
-                    // Si el producto NO es alcohol (ej: viendo Coca Cola), sugerimos otros snacks o bebidas soft
-                    // O incluso podríamos sugerir alcohol aquí (Cross-sell inverso: ¿Quieres Ron con tu Coca?), 
-                    // pero por seguridad mantendremos similares o complementos soft.
                     Promise.all([
                         fetchProducts(undefined, 'CONFITERÍA', selectedBranch?.id),
                         fetchProducts(undefined, 'BEBIDAS NO ALCOHÓLICAS', selectedBranch?.id)
@@ -99,7 +114,7 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
             })
             .catch(err => console.error(err))
             .finally(() => setLoading(false));
-    }, [slug, selectedBranch, initialProduct]);
+    }, [slug, selectedBranch, initialProduct, searchTerm === ""]); // Reset when search cleared
 
     const addToCart = () => {
         if (!product || isOutOfStock) return;
@@ -225,12 +240,29 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                             </div>
                         </div>
 
-                        {/* --- CROSS SELLING: "THE FINISHING TOUCH" --- */}
+                        {/* --- CROSS SELLING: "EL TOQUE FINAL" --- */}
                         {suggestions.length > 0 && (
                             <div className="border-t border-white/10 pt-10 mb-32">
-                                <div className="flex items-center justify-between mb-6">
-                                    <h4 className="font-display text-2xl italic text-zinc-400">The Finishing Touch</h4>
-                                    <span className="text-[10px] text-zinc-600 uppercase tracking-widest animate-pulse">Desliza para más →</span>
+                                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+                                    <div className="flex flex-col gap-1">
+                                        <h4 className="font-display text-3xl italic text-zinc-200">El Toque Final</h4>
+                                        <p className="text-[10px] text-zinc-500 uppercase tracking-[0.2em]">Completa tu orden sin salir de aquí</p>
+                                    </div>
+
+                                    {/* Quick Search Input */}
+                                    <div className="relative w-full md:w-64 group">
+                                        <span className="absolute left-4 top-1/2 -translate-y-1/2 material-symbols-outlined text-zinc-500 group-focus-within:text-primary transition-colors text-lg">search</span>
+                                        <input
+                                            type="text"
+                                            placeholder="Buscar hielo, cola, snacks..."
+                                            value={searchTerm}
+                                            onChange={(e) => setSearchTerm(e.target.value)}
+                                            className="w-full bg-white/[0.03] border border-white/10 rounded-full py-3 pl-11 pr-4 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-primary/50 focus:bg-white/[0.06] transition-all"
+                                        />
+                                        {isSearching && (
+                                            <div className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 border-2 border-primary/20 border-t-primary rounded-full animate-spin" />
+                                        )}
+                                    </div>
                                 </div>
 
                                 <div className="flex gap-4 overflow-x-auto pb-4 -mx-2 px-2 scrollbar-hide snap-x snap-mandatory">
