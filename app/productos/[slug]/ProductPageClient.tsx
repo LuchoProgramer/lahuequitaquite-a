@@ -43,33 +43,54 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                 setProduct(res.data);
 
                 // --- LÓGICA DE "THE FINISHING TOUCH" (CROSS-SELLING) ---
-                const licores = ['RON', 'WHISKY', 'CERVEZA', 'AGUARDIENTE', 'VINO', 'GIN', 'VODKA', 'TEQUILA'];
-                const isAlcohol = licores.some(cat => res.data.categoria_nombre.toUpperCase().includes(cat));
+                // Estrategia: "Lista Segura". Si el producto es Alcohol, SOLO mostramos complementos.
+                // Categorías de Alcohol conocidas
+                const alcoholCategories = ['RON', 'WHISKY', 'CERVEZA', 'AGUARDIENTE', 'ZHUMIR', 'VINO', 'CHAMPAGNE', 'GIN', 'VODKA', 'TEQUILA', 'LICOR', 'VARIOS'];
+
+                const currentCategory = res.data.categoria_nombre.toUpperCase();
+                const isAlcohol = alcoholCategories.some(cat => currentCategory.includes(cat));
 
                 if (isAlcohol) {
-                    // Estrategia: Traer mixers, cigarrillos y snacks
+                    // Solo traemos categorías de la "Lista Segura" (Mixers, Tabaco, Snacks)
+                    // Nombres exactos según la base de datos para asegurar matches
                     Promise.all([
-                        fetchProducts(undefined, 'BEBIDAS NO ALCOHÓLICAS', selectedBranch?.id), // Aguas y Tónicas
-                        fetchProducts(undefined, 'COLAS/GASEOSAS', selectedBranch?.id),         // Mixers
-                        fetchProducts(undefined, 'CONFITERÍA', selectedBranch?.id),             // Chocolates
-                        fetchProducts(undefined, 'CIGARRILLOS', selectedBranch?.id)             // Tabaco
-                    ]).then(([noAlc, gaseosas, confiteria, cigarros]) => {
+                        fetchProducts(undefined, 'Agua con Gas', selectedBranch?.id),
+                        fetchProducts(undefined, 'Agua Natural', selectedBranch?.id),
+                        fetchProducts(undefined, 'COLAS/GASEOSAS', selectedBranch?.id),
+                        fetchProducts(undefined, 'Jugos', selectedBranch?.id),
+                        fetchProducts(undefined, 'CIGARRILLOS', selectedBranch?.id),
+                        fetchProducts(undefined, 'CONFITERÍA', selectedBranch?.id)
+                    ]).then(([aguasGas, aguasNat, gaseosas, jugos, cigarros, confiteria]) => {
                         const allExtras = [
-                            ...(noAlc.data || []),
+                            ...(aguasGas.data || []),
+                            ...(aguasNat.data || []),
                             ...(gaseosas.data || []),
-                            ...(cigarros.data || []), // CIGARRILLOS AHORA INCLUIDOS
+                            ...(jugos.data || []),
+                            ...(cigarros.data || []),
                             ...(confiteria.data || [])
                         ];
 
-                        // Mezcla aleatoria pero priorizando mixers
-                        setSuggestions(allExtras.sort(() => 0.5 - Math.random()).slice(0, 8));
+                        // Verificar que no sugerimos el mismo producto (aunque improbable aqui)
+                        const filtered = allExtras.filter(p => p.id !== res.data.id);
+
+                        // Mezclar aleatoriamente para variedad
+                        setSuggestions(filtered.sort(() => 0.5 - Math.random()).slice(0, 8));
                     });
                 } else {
-                    // Si no es alcohol, sugerir similares
-                    fetchProducts(undefined, res.data.categoria_nombre, selectedBranch?.id)
-                        .then(resp => {
-                            setSuggestions(resp.data?.filter((p: Product) => p.slug !== slug).slice(0, 6) || []);
-                        });
+                    // Si el producto NO es alcohol (ej: viendo Coca Cola), sugerimos otros snacks o bebidas soft
+                    // O incluso podríamos sugerir alcohol aquí (Cross-sell inverso: ¿Quieres Ron con tu Coca?), 
+                    // pero por seguridad mantendremos similares o complementos soft.
+                    Promise.all([
+                        fetchProducts(undefined, 'CONFITERÍA', selectedBranch?.id),
+                        fetchProducts(undefined, 'BEBIDAS NO ALCOHÓLICAS', selectedBranch?.id)
+                    ]).then(([confiteria, bebidas]) => {
+                        const safeSuggestions = [
+                            ...(confiteria.data || []),
+                            ...(bebidas.data || [])
+                        ].filter(p => p.id !== res.data.id && p.slug !== slug);
+
+                        setSuggestions(safeSuggestions.sort(() => 0.5 - Math.random()).slice(0, 6));
+                    });
                 }
             })
             .catch(err => console.error(err))
@@ -168,8 +189,8 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                                 onClick={addToCart}
                                 disabled={isOutOfStock}
                                 className={`w-full py-4 uppercase tracking-[0.2em] text-sm font-bold transition-all duration-300 ${isOutOfStock
-                                        ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
-                                        : 'bg-[#D4AF37] text-black hover:bg-white'
+                                    ? 'bg-zinc-800 text-zinc-500 cursor-not-allowed'
+                                    : 'bg-[#D4AF37] text-black hover:bg-white'
                                     }`}
                             >
                                 {isOutOfStock ? 'Agotado' : 'Añadir a la Inversión'}
