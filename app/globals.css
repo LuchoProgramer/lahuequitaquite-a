@@ -10,10 +10,21 @@
   --color-surface-dark: #221d10;
   --color-card: #221d10;
   --color-border: rgba(255, 255, 255, 0.05);
-  
+
   --font-sans: var(--font-plus-jakarta), var(--font-geist-sans), system-ui;
   --font-display: var(--font-playfair), var(--font-plus-jakarta);
-  
+
+  @layer utilities {
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  }
+
   --radius-DEFAULT: 0.25rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
@@ -77,6 +88,7 @@ html {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;
@@ -85,13 +97,16 @@ html {
 ::-webkit-scrollbar {
   width: 4px;
 }
+
 ::-webkit-scrollbar-track {
   background: #181611;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #221d10;
   border-radius: 10px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
   background: #eebd2b;
 }

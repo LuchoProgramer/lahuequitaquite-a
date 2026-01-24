@@ -244,7 +244,7 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                                                         alt={item.nombre}
                                                     />
                                                 </div>
-                                                <h5 className="text-[11px] text-zinc-400 uppercase tracking-wide truncate pr-8">{item.name || item.nombre}</h5>
+                                                <h5 className="text-[11px] text-zinc-400 uppercase tracking-wide truncate pr-8">{item.nombre}</h5>
                                                 <p className="text-sm font-bold text-white mt-1">${item.precio}</p>
                                             </Link>
 
