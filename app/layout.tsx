@@ -24,7 +24,29 @@ const plusJakarta = Plus_Jakarta_Sans({
 
 export const metadata: Metadata = {
   title: "La Huequita Quiteña | Licores Premium y de Barrio en Quito",
-  description: "La mejor selección de licores en Quito con envío a domicilio via WhatsApp.",
+  description: "La mejor selección de licores en Quito con envío a domicilio via WhatsApp. Garantía de originalidad y entregas rápidas.",
+  openGraph: {
+    title: "La Huequita Quiteña | Licores Premium en Quito",
+    description: "La mejor selección de licores en Quito con envío a domicilio. ¡Pide lo tuyo por WhatsApp!",
+    url: "https://lahuequitaquitena.com",
+    siteName: "La Huequita Quiteña",
+    images: [
+      {
+        url: "/logo-icon.png", // Next.js will resolve from public
+        width: 1024,
+        height: 888,
+        alt: "La Huequita Quiteña Logo",
+      },
+    ],
+    locale: "es_EC",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "La Huequita Quiteña | Licores Premium",
+    description: "Licores originales a domicilio en Quito.",
+    images: ["/logo-icon.png"],
+  },
 };
 
 import AgeGate from "@/components/AgeGate";

@@ -12,9 +12,11 @@ export default function Footer() {
                     {/* Brand Section */}
                     <div className="flex flex-col items-center md:items-start text-center md:text-left">
                         <Link href="/" className="mb-6">
-                            <h2 className="text-2xl font-extrabold uppercase tracking-[0.2em] text-white">
-                                La Huequita<br /><span className="text-primary italic font-display lowercase tracking-normal text-xl">Quiteña</span>
-                            </h2>
+                            <img
+                                src="/logo-icon.png"
+                                alt="La Huequita Quiteña"
+                                className="h-20 w-auto object-contain brightness-110 grayscale-[0.2] hover:grayscale-0 transition-all duration-500"
+                            />
                         </Link>
                         <p className="text-gray-500 text-xs uppercase tracking-[0.2em] max-w-[280px] leading-relaxed">
                             La excelencia en licores premium y de barrio, directo a tu puerta en Quito.

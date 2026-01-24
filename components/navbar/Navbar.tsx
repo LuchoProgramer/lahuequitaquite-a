@@ -47,10 +47,11 @@ export default function Navbar() {
 
                     {/* Center: Brand */}
                     <Link href="/" className="flex items-center gap-2 flex-shrink-0">
-                        <span className="material-symbols-outlined text-primary text-[24px]">local_bar</span>
-                        <h1 className="text-xl font-black tracking-tighter text-white flex items-center gap-2 uppercase font-display">
-                            La Huequita
-                        </h1>
+                        <img
+                            src="/logo-text.png"
+                            alt="La Huequita Quiteña"
+                            className="h-10 md:h-12 w-auto object-contain brightness-110 drop-shadow-sm"
+                        />
                     </Link>
 
                     {/* Right: Actions */}
