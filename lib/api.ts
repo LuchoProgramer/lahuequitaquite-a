@@ -25,10 +25,26 @@ export function getImageUrl(path: string | null | undefined): string | null {
     return `${host}${cleanPath}`;
 }
 
+// Circuit Breaker: Evitar bucles infinitos de peticiones
+let sucursalesFetchCount = 0;
+
 export async function fetchSucursales(): Promise<{ success: boolean; data: Sucursal[] }> {
-    const res = await fetch(`${API_URL}/tienda/sucursales/`, { headers });
-    if (!res.ok) throw new Error("Failed to fetch sucursales");
-    return res.json();
+    if (sucursalesFetchCount >= 3) {
+        console.warn("🛑 [Circuit Breaker] Detenidas peticiones excesivas a sucursales. Usando versión cacheada vacía para evitar bloqueo.");
+        // Devolvemos un array vacío o lo que sea seguro para no romper la UI, pero NO hacemos fetch.
+        return { success: false, data: [] };
+    }
+    sucursalesFetchCount++;
+    console.log(`🌐 [API] Fetching sucursales (Intento ${sucursalesFetchCount}/3)`);
+
+    try {
+        const res = await fetch(`${API_URL}/tienda/sucursales/`, { headers });
+        if (!res.ok) throw new Error("Failed to fetch sucursales");
+        return res.json();
+    } catch (error) {
+        // Si falla, no decrementamos el contador para evitar reintentos infinitos en bucle de error
+        throw error;
+    }
 }
 
 export async function fetchHomeData(sucursalId?: number | string): Promise<HomeData> {
