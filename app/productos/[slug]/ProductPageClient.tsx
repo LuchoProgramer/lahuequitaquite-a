@@ -54,20 +54,24 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                     // Solo traemos categorías de la "Lista Segura" (Mixers, Tabaco, Snacks)
                     // Nombres exactos según la base de datos para asegurar matches
                     Promise.all([
-                        fetchProducts(undefined, 'Agua con Gas', selectedBranch?.id),
-                        fetchProducts(undefined, 'Agua Natural', selectedBranch?.id),
-                        fetchProducts(undefined, 'COLAS/GASEOSAS', selectedBranch?.id),
-                        fetchProducts(undefined, 'Jugos', selectedBranch?.id),
-                        fetchProducts(undefined, 'CIGARRILLOS', selectedBranch?.id),
-                        fetchProducts(undefined, 'CONFITERÍA', selectedBranch?.id)
-                    ]).then(([aguasGas, aguasNat, gaseosas, jugos, cigarros, confiteria]) => {
+                        fetchProducts(undefined, 'Agua con Gas', selectedBranch?.id).catch(() => ({ data: [] })),
+                        fetchProducts(undefined, 'Agua Natural', selectedBranch?.id).catch(() => ({ data: [] })),
+                        fetchProducts(undefined, 'COLAS/GASEOSAS', selectedBranch?.id).catch(() => ({ data: [] })),
+                        fetchProducts(undefined, 'Bebidas energéticas', selectedBranch?.id).catch(() => ({ data: [] })),
+                        fetchProducts(undefined, 'Jugos', selectedBranch?.id).catch(() => ({ data: [] })),
+                        fetchProducts(undefined, 'CIGARRILLOS', selectedBranch?.id).catch(() => ({ data: [] })),
+                        fetchProducts(undefined, 'CONFITERÍA', selectedBranch?.id).catch(() => ({ data: [] })),
+                        fetchProducts(undefined, 'BEBIDAS NO ALCOHÓLICAS', selectedBranch?.id).catch(() => ({ data: [] }))
+                    ]).then(([aguasGas, aguasNat, gaseosas, energizantes, jugos, cigarros, confiteria, noAlcohol]) => {
                         const allExtras = [
                             ...(aguasGas.data || []),
                             ...(aguasNat.data || []),
                             ...(gaseosas.data || []),
+                            ...(energizantes.data || []),
                             ...(jugos.data || []),
                             ...(cigarros.data || []),
-                            ...(confiteria.data || [])
+                            ...(confiteria.data || []),
+                            ...(noAlcohol.data || [])
                         ];
 
                         // Verificar que no sugerimos el mismo producto (aunque improbable aqui)
