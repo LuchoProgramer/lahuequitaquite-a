@@ -240,7 +240,7 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                                                 <div className="aspect-square bg-white/[0.03] rounded-xl mb-3 overflow-hidden relative border border-white/5">
                                                     <img
                                                         src={getImageUrl(item.imagen || item.image) || "/placeholder.jpg"}
-                                                        className="w-full h-full object-contain p-4 opacity-70 grayscale group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500"
+                                                        className="w-full h-full object-contain p-4 group-hover:scale-105 transition-all duration-500"
                                                         alt={item.nombre}
                                                     />
                                                 </div>

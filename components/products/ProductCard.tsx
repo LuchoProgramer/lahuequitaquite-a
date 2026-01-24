@@ -57,7 +57,7 @@ export default function ProductCard(product: ProductCardProps) {
                     <img
                         src={getImageUrl(imagen) || "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop"}
                         alt={nombre}
-                        className="w-full h-full object-contain drop-shadow-2xl filter brightness-[0.85] contrast-[1.1] group-hover:brightness-105 group-hover:scale-110 transition-all duration-500 will-change-transform"
+                        className="w-full h-full object-contain drop-shadow-2xl filter brightness-100 group-hover:brightness-110 group-hover:scale-110 transition-all duration-500 will-change-transform"
                         onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             const fallbackUrl = "https://images.unsplash.com/photo-1569158062925-ddbac4b3ef9a?q=80&w=1887&auto=format&fit=crop";
