@@ -19,12 +19,9 @@ export function BranchProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        console.log("🐛 [BranchProvider] MOUNTING/EFFECT TRIGGERED");
         async function loadBranches() {
             try {
-                console.log("🚀 [BranchProvider] Fetching sucursales...");
                 const { data } = await fetchSucursales();
-                console.log("✅ [BranchProvider] Fetched:", data.length, "branches");
                 setAvailableBranches(data);
 
                 // Cargar selección previa de localStorage
