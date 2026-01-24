@@ -51,6 +51,7 @@ export const metadata: Metadata = {
 
 import AgeGate from "@/components/AgeGate";
 import Footer from "@/components/common/Footer";
+import ToastContainer from "@/components/ui/ToastContainer";
 
 export default function RootLayout({
   children,
@@ -75,6 +76,7 @@ export default function RootLayout({
                   </main>
                   <Footer />
                   <BottomNav />
+                  <ToastContainer />
                 </div>
               </AgeGate>
             </CartProvider>

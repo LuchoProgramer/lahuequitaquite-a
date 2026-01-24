@@ -8,6 +8,7 @@ import CartDrawer from "@/components/cart/CartDrawer";
 import MobileMenu from "@/components/navbar/MobileMenu";
 import BranchSelector from "@/components/navbar/BranchSelector";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
 
 export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
@@ -54,20 +55,23 @@ export default function Navbar() {
                         />
                     </Link>
 
-                    {/* Right: Actions */}
                     <div className="flex items-center justify-end gap-1 md:gap-4 flex-1">
                         <button className="hidden sm:flex items-center justify-center p-2 rounded-full hover:bg-white/5 transition-colors text-white">
                             <span className="material-symbols-outlined text-[24px]">search</span>
                         </button>
-                        <button
+                        <motion.button
+                            key={totalItems}
+                            initial={totalItems > 0 ? { scale: 1 } : false}
+                            animate={totalItems > 0 ? { scale: [1, 1.2, 1] } : {}}
+                            transition={{ duration: 0.3 }}
                             onClick={() => setIsCartOpen(true)}
                             className="relative flex items-center justify-center p-2 rounded-full hover:bg-white/5 transition-colors text-white active:scale-95"
                         >
                             <span className="material-symbols-outlined text-[24px]">shopping_cart</span>
                             {totalItems > 0 && (
-                                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary ring-2 ring-background-dark animate-pulse"></span>
+                                <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-primary ring-2 ring-background-dark"></span>
                             )}
-                        </button>
+                        </motion.button>
                     </div>
                 </div>
             </header>

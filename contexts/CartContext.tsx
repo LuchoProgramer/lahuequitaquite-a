@@ -2,6 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Product } from "@/lib/types";
+import { useUI } from "./UIContext";
 
 interface CartItem extends Product {
     quantity: number;
@@ -20,6 +21,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
+    const { showToast } = useUI();
     const [items, setItems] = useState<CartItem[]>([]);
 
     // Load cart from localStorage on mount
@@ -43,20 +45,20 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
         setItems((prev) => {
             const existing = prev.find((item) => item.id === product.id);
             if (existing) {
-                // Check if adding one more exceeds stock
                 if (existing.quantity >= product.stock_total) {
-                    alert(`Lo sentimos, solo hay ${product.stock_total} unidades disponibles de ${product.nombre}`);
+                    showToast(`Solo hay ${product.stock_total} unidades de ${product.nombre}`, "error");
                     return prev;
                 }
+                showToast(`Se agregó otro ${product.nombre}`, "success");
                 return prev.map((item) =>
                     item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
                 );
             }
-            // Check if there's any stock at all
             if (product.stock_total <= 0) {
-                alert(`Lo sentimos, ${product.nombre} está agotado`);
+                showToast(`${product.nombre} está agotado`, "error");
                 return prev;
             }
+            showToast(`${product.nombre} listo en el carrito`, "success");
             return [...prev, { ...product, quantity: 1 }];
         });
     };
@@ -72,7 +74,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
                     const newQuantity = Math.max(1, item.quantity + delta);
                     // Check stock limit for increase
                     if (delta > 0 && newQuantity > item.stock_total) {
-                        alert(`Lo sentimos, solo hay ${item.stock_total} unidades disponibles`);
+                        showToast(`Solo hay ${item.stock_total} unidades disponibles`, "error");
                         return item;
                     }
                     return { ...item, quantity: newQuantity };
