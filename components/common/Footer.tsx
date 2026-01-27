@@ -32,7 +32,7 @@ export default function Footer() {
                             <a href="https://facebook.com/lahuequitaquitena" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-colors">
                                 <span className="text-lg font-bold">Fb</span>
                             </a>
-                            <a href={`https://wa.me/${selectedBranch?.telefono?.replace(/\D/g, '') || '593959866696'}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-colors">
+                            <a href={`https://wa.me/${selectedBranch?.telefono?.replace(/\D/g, '') || '593992660222'}`} target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-colors">
                                 <span className="material-symbols-outlined text-lg">chat</span>
                             </a>
                         </div>
@@ -50,7 +50,7 @@ export default function Footer() {
                             </div>
                             <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <span className="material-symbols-outlined text-primary text-lg">phone</span>
-                                <span>{selectedBranch?.telefono || "+593 95 986 6696"}</span>
+                                <span>{selectedBranch?.telefono || "+593 99 266 0222"}</span>
                             </div>
                             <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <span className="material-symbols-outlined text-primary text-lg">mail</span>
