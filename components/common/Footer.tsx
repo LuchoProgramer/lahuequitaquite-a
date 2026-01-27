@@ -26,8 +26,11 @@ export default function Footer() {
 
                         {/* Social Links */}
                         <div className="flex gap-4 mb-4">
-                            <a href="https://instagram.com/lahuequitaquitena" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-colors">
+                            <a href="https://www.instagram.com/licorerialahuequitaquitena/" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-colors">
                                 <span className="text-lg font-bold">Ig</span>
+                            </a>
+                            <a href="https://www.tiktok.com/@lahuequitaquitena" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-colors">
+                                <span className="text-lg font-bold">Tk</span>
                             </a>
                             <a href="https://facebook.com/lahuequitaquitena" target="_blank" rel="noopener noreferrer" className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center hover:bg-primary hover:text-black transition-colors">
                                 <span className="text-lg font-bold">Fb</span>
