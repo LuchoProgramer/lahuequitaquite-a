@@ -3,8 +3,10 @@
 import React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useBranch } from "@/contexts/BranchContext";
 
 export default function Footer() {
+    const { selectedBranch } = useBranch();
     return (
         <footer className="relative bg-background-dark border-t border-white/5 pt-16 pb-24 md:pb-12 px-6 overflow-hidden">
             <div className="max-w-7xl mx-auto">
@@ -42,11 +44,13 @@ export default function Footer() {
                         <div className="space-y-4 text-gray-400 text-xs font-medium uppercase tracking-widest mb-6">
                             <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <span className="material-symbols-outlined text-primary text-lg">location_on</span>
-                                <span>República Dominicana N80-40 y Alonso de Carcelén, Quito</span>
+                                <span className="max-w-[250px] leading-relaxed">
+                                    {selectedBranch?.direccion || "República Dominicana N80-40 y Alonso de Carcelén, Quito"}
+                                </span>
                             </div>
                             <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <span className="material-symbols-outlined text-primary text-lg">phone</span>
-                                <span>+593 96 406 5880</span>
+                                <span>{selectedBranch?.telefono || "+593 96 406 5880"}</span>
                             </div>
                             <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <span className="material-symbols-outlined text-primary text-lg">mail</span>

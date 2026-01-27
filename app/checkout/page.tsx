@@ -79,11 +79,8 @@ export default function CheckoutPage() {
         // Abrir WhatsApp
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank');
 
-        // Limpiar carrito (opcional, o preguntar al usuario)
-        // clearCart(); 
-        // Por UX, a veces es mejor no limpiar inmediatamente por si el usuario regresa, 
-        // pero para "simular" compra real, podríamos hacerlo o redirigir a una "Thank You Page".
-        // Por ahora, solo redirigimos.
+        // Redirigir a página de gracias
+        router.push("/checkout/success");
     };
 
     if (loading) return null;
@@ -194,8 +191,8 @@ export default function CheckoutPage() {
                                     <label
                                         key={method.id}
                                         className={`flex items-center gap-4 p-4 rounded-xl border cursor-pointer transition-all ${formData.metodoPago === method.id
-                                                ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(238,189,43,0.1)]'
-                                                : 'bg-black/20 border-white/5 hover:border-white/20'
+                                            ? 'bg-primary/10 border-primary shadow-[0_0_15px_rgba(238,189,43,0.1)]'
+                                            : 'bg-black/20 border-white/5 hover:border-white/20'
                                             }`}
                                     >
                                         <input

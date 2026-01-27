@@ -98,7 +98,8 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                     "url": `https://lahuequitaquitena.com/productos/${initialProduct.slug}`,
                     "seller": {
                         "@type": "Organization",
-                        "name": "La Huequita Quiteña"
+                        "name": "La Huequita Quiteña",
+                        "logo": "https://lahuequitaquitena.com/icon.png"
                     }
                 }
             };
