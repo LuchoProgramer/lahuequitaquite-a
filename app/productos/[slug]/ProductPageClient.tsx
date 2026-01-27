@@ -222,7 +222,7 @@ export default function ProductPageClient({ slug, initialProduct }: ProductPageC
                             >
                                 {isOutOfStock ? 'Agotado' : 'Añadir a la Inversión'}
                             </button>
-                            <p className="text-center text-[10px] text-zinc-600 uppercase tracking-widest mt-2">Envío seguro a todo Quito</p>
+                            <p className="text-center text-[10px] text-zinc-600 uppercase tracking-widest mt-2">Envío seguro al Norte de Quito</p>
                         </div>
 
                         {/* Tasting Notes Accordion */}

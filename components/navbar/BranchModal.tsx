@@ -194,7 +194,7 @@ export default function BranchModal({ isOpen, onClose }: BranchModalProps) {
 
                             {/* Footer Banner */}
                             <div className="p-4 bg-primary text-center">
-                                <p className="text-background-dark text-[10px] font-black uppercase tracking-[0.3em]">Envios a todo Quito en menos de 60 minutos</p>
+                                <p className="text-background-dark text-[10px] font-black uppercase tracking-[0.3em]">Envíos al Norte de Quito en menos de 60 minutos</p>
                             </div>
                         </motion.div>
                     </div>
