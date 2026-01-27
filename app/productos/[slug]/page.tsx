@@ -1,6 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
-import { fetchProductBySlug, fetchProducts } from "@/lib/api";
+import { fetchProductBySlug, fetchProducts, getImageUrl } from "@/lib/api";
 import ProductPageClient from "./ProductPageClient";
 
 // Permitir generación dinámica de páginas que no están pre-renderizadas
@@ -74,14 +74,49 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
 
     // Fetch inicial en el servidor para mejor SEO
     let initialProduct = null;
+    let jsonLd = null;
 
     try {
         const response = await fetchProductBySlug(slug);
         initialProduct = response.data;
+
+        if (initialProduct) {
+            const imageUrl = getImageUrl(initialProduct.imagen || initialProduct.image);
+
+            jsonLd = {
+                "@context": "https://schema.org",
+                "@type": "Product",
+                "name": initialProduct.nombre,
+                "description": initialProduct.meta_descripcion || initialProduct.descripcion || `Compra ${initialProduct.nombre} al mejor precio.`,
+                "image": imageUrl ? [imageUrl] : [],
+                "sku": initialProduct.id,
+                "offers": {
+                    "@type": "Offer",
+                    "price": initialProduct.precio,
+                    "priceCurrency": "USD",
+                    "availability": initialProduct.stock_total > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+                    "url": `https://lahuequitaquitena.com/productos/${initialProduct.slug}`,
+                    "seller": {
+                        "@type": "Organization",
+                        "name": "La Huequita Quiteña"
+                    }
+                }
+            };
+        }
     } catch (error) {
         console.error("Error fetching product:", error);
     }
 
     // Renderizar el componente cliente con datos iniciales
-    return <ProductPageClient slug={slug} initialProduct={initialProduct} />;
+    return (
+        <>
+            {jsonLd && (
+                <script
+                    type="application/ld+json"
+                    dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+                />
+            )}
+            <ProductPageClient slug={slug} initialProduct={initialProduct} />
+        </>
+    );
 }

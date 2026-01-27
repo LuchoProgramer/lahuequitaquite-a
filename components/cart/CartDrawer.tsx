@@ -2,6 +2,7 @@
 
 import React from "react";
 import { useCart } from "@/contexts/CartContext";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { getImageUrl } from "@/lib/api";
 import { motion, AnimatePresence } from "framer-motion";
@@ -132,14 +133,15 @@ export default function CartDrawer({ isOpen, onClose }: CartDrawerProps) {
                                     </div>
                                 </div>
 
-                                <Button
-                                    variant="gold"
-                                    className="w-full gap-3 py-6 h-16 shadow-[0_10px_30px_rgba(238,189,43,0.2)]"
-                                    onClick={handleCheckout}
-                                >
-                                    <span className="material-symbols-outlined">send</span>
-                                    Pedido por WhatsApp
-                                </Button>
+                                <Link href="/checkout" onClick={onClose}>
+                                    <Button
+                                        variant="gold"
+                                        className="w-full gap-3 py-6 h-16 shadow-[0_10px_30px_rgba(238,189,43,0.2)]"
+                                    >
+                                        <span className="material-symbols-outlined">shopping_cart_checkout</span>
+                                        Ir a Pagar / Confirmar
+                                    </Button>
+                                </Link>
 
                                 <p className="text-[9px] text-center text-gray-500 uppercase tracking-[0.3em] leading-relaxed opacity-50">
                                     Finaliza tu compra conversando con nosotros
