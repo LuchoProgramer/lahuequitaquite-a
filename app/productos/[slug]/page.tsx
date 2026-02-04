@@ -4,16 +4,11 @@ import { fetchProductBySlug, fetchProducts, getImageUrl } from "@/lib/api";
 import ProductPageClient from "./ProductPageClient";
 
 // Permitir generación dinámica de páginas que no están pre-renderizadas
-// En desarrollo: genera dinámicamente, en producción: usa static params
 export const dynamicParams = true;
+export const revalidate = 7200; // 2 hours
 
 // Generar rutas estáticas en build time
 export async function generateStaticParams() {
-    // En desarrollo, retornar array vacío para permitir generación dinámica
-    if (process.env.NODE_ENV === 'development') {
-        return [];
-    }
-
     try {
         const response = await fetchProducts();
         const products = response.data || [];

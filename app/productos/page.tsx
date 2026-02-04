@@ -9,6 +9,8 @@ export const metadata: Metadata = {
     description: "Explora nuestra selección completa de licores nacionales e importados en Quito.",
 };
 
+export const revalidate = 3600; // 1 hour
+
 export default async function CatalogPage() {
     const { categorias } = await fetchHomeData();
     const { data: products } = await fetchProducts();

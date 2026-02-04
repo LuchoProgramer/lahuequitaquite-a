@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'api.ledgerxpertz.com',
-        pathname: '/media/**',
+        pathname: '/**',
       },
       {
         protocol: 'https',

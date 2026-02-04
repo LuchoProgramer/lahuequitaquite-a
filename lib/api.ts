@@ -12,17 +12,28 @@ const headers = {
     "Content-Type": "application/json",
 };
 
+const imageUrlCache = new Map<string, string | null>();
+
 export function getImageUrl(path: string | null | undefined): string | null {
     if (!path) return null;
-    if (path.startsWith('http')) return path;
+    if (imageUrlCache.has(path)) {
+        return imageUrlCache.get(path)!;
+    }
 
-    // Asegurarnos de tener el host correcto
-    const host = "https://api.ledgerxpertz.com";
+    let result: string | null;
 
-    // Asegurarnos de que el path empiece con /
-    const cleanPath = path.startsWith('/') ? path : `/${path}`;
+    if (path.startsWith('http')) {
+        result = path;
+    } else {
+        // Asegurarnos de tener el host correcto
+        const host = "https://api.ledgerxpertz.com";
+        // Asegurarnos de que el path empiece con /
+        const cleanPath = path.startsWith('/') ? path : `/${path}`;
+        result = `${host}${cleanPath}`;
+    }
 
-    return `${host}${cleanPath}`;
+    imageUrlCache.set(path, result);
+    return result;
 }
 
 // Circuit Breaker: Evitar bucles infinitos de peticiones
@@ -52,7 +63,7 @@ export async function fetchHomeData(sucursalId?: number | string): Promise<HomeD
     const res = await fetch(url, {
         headers,
         next: {
-            revalidate: 60,
+            revalidate: 3600, // 1 hour
             tags: ['home']
         }
     });
@@ -69,7 +80,7 @@ export async function fetchProducts(search?: string, categoria?: string, sucursa
     const res = await fetch(`${API_URL}/tienda/productos/?${params.toString()}`, {
         headers,
         next: {
-            revalidate: 60,
+            revalidate: 3600, // 1 hour
             tags: ['products']
         }
     });
@@ -81,7 +92,7 @@ export async function fetchProductBySlug(slug: string, sucursalId?: number | str
     const res = await fetch(url, {
         headers,
         next: {
-            revalidate: 60,
+            revalidate: 7200, // 2 hours
             tags: [`product-${slug}`]
         }
     });
