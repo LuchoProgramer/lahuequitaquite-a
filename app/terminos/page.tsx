@@ -51,7 +51,20 @@ export default function TerminosPage() {
                     </section>
 
                     <section>
-                        <h2 className="text-xl font-bold uppercase tracking-widest text-white border-b border-white/10 pb-2 mb-4">5. Propiedad Intelectual</h2>
+                        <h2 className="text-xl font-bold uppercase tracking-widest text-white border-b border-white/10 pb-2 mb-4">5. Proceso de Compra y Pagos</h2>
+                        <p className="mb-4">
+                            Este sitio web funciona como un catálogo digital que facilita la reserva de productos. <strong>No procesamos, almacenamos ni solicitamos información de tarjetas de crédito o débito directamente en este portal.</strong>
+                        </p>
+                        <p>Los métodos de pago aceptados para finalizar la transacción son:</p>
+                        <ul className="list-disc pl-6 space-y-2 mt-2">
+                            <li><strong>Transferencia Bancaria:</strong> Se verificará antes del despacho.</li>
+                            <li><strong>Efectivo contra entrega:</strong> Pago directo al repartidor.</li>
+                            <li><strong>Tarjeta de Crédito/Débito contra entrega:</strong> Mediante terminal físico (Datafast) llevado por el repartidor al domicilio.</li>
+                        </ul>
+                    </section>
+
+                    <section>
+                        <h2 className="text-xl font-bold uppercase tracking-widest text-white border-b border-white/10 pb-2 mb-4">6. Propiedad Intelectual</h2>
                         <p>
                             Todo el contenido de este sitio, incluyendo logotipos, textos, gráficos y software, es propiedad de La Huequita Quiteña y está protegido por las leyes de propiedad intelectual internacionales y del Ecuador.
                         </p>

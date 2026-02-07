@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import { useBranch } from "@/contexts/BranchContext";
 
 export default function Footer() {
-    const { selectedBranch } = useBranch();
+    const { selectedBranch, availableBranches } = useBranch();
     return (
         <footer className="relative bg-background-dark border-t border-white/5 pt-16 pb-24 md:pb-12 px-6 overflow-hidden">
             <div className="max-w-7xl mx-auto">
@@ -48,17 +48,14 @@ export default function Footer() {
                             <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <span className="material-symbols-outlined text-primary text-lg">location_on</span>
                                 <span className="max-w-[250px] leading-relaxed">
-                                    {selectedBranch?.direccion || "República Dominicana N80-40 y Alonso de Carcelén, Quito"}
+                                    {availableBranches.find(b => b.es_principal)?.direccion || "Carcelén, República Dominicana N78-130 y Hernando De Veas"}
                                 </span>
                             </div>
                             <div className="flex items-center gap-3 justify-center md:justify-start">
                                 <span className="material-symbols-outlined text-primary text-lg">phone</span>
-                                <span>{selectedBranch?.telefono || "+593 99 266 0222"}</span>
+                                <span>{availableBranches.find(b => b.es_principal)?.telefono || "+593 99 266 0222"}</span>
                             </div>
-                            <div className="flex items-center gap-3 justify-center md:justify-start">
-                                <span className="material-symbols-outlined text-primary text-lg">mail</span>
-                                <span>info@lahuequitaquitena.com</span>
-                            </div>
+                            {/* Email removed as per user request to avoid miscommunication */}
                         </div>
 
                         {/* Payment Methods */}
@@ -78,6 +75,7 @@ export default function Footer() {
                             <Link href="/politicas" className="text-gray-400 text-[10px] uppercase tracking-[0.3em] hover:text-primary transition-colors">Política de Devoluciones</Link>
                             <Link href="/terminos" className="text-gray-400 text-[10px] uppercase tracking-[0.3em] hover:text-primary transition-colors">Términos y Condiciones</Link>
                             <Link href="/privacidad" className="text-gray-400 text-[10px] uppercase tracking-[0.3em] hover:text-primary transition-colors">Aviso de Privacidad</Link>
+                            <Link href="/contacto" className="text-gray-400 text-[10px] uppercase tracking-[0.3em] hover:text-primary transition-colors">Contáctanos</Link>
                         </div>
                     </div>
                 </div>

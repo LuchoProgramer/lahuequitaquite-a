@@ -219,6 +219,16 @@ export default function CheckoutPage() {
                             <p className="text-[10px] text-center text-gray-500 mt-4">
                                 Al confirmar, serás redirigido a WhatsApp para finalizar la coordinación.
                             </p>
+                            <div className="mt-6 bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-xl flex gap-3 items-start">
+                                <span className="material-symbols-outlined text-yellow-500 mt-0.5">lock</span>
+                                <div className="text-xs text-gray-400">
+                                    <p className="font-bold text-yellow-500 mb-1 uppercase tracking-wider">Pago Seguro</p>
+                                    <p>
+                                        El pago se realiza únicamente al momento de la entrega o vía transferencia directa.
+                                        <strong>Nunca te pediremos datos de tu tarjeta en este sitio web.</strong>
+                                    </p>
+                                </div>
+                            </div>
                         </form>
                     </motion.div>
                 </div>
