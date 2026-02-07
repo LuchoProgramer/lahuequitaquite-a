@@ -128,12 +128,12 @@ export default function ContactoPage() {
                         <iframe
                             width="100%"
                             height="100%"
-                            style={{ border: 0, filter: "grayscale(1) invert(0.9) contrast(1.2)" }}
+                            style={{ border: 0 }}
                             loading="lazy"
                             allowFullScreen
                             referrerPolicy="no-referrer-when-downgrade"
                             title="Mapa de Ubicación La Huequita"
-                            src={`https://maps.google.com/maps?q=${DEFAULT_CENTER.lat},${DEFAULT_CENTER.lng}&hl=es&z=15&output=embed`}
+                            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d293.10606521191926!2d-78.4692679939701!3d-0.09016600924985645!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x91d58f5968f20eb5%3A0xe392531a5fe97291!2sLicorer%C3%ADa%20La%20Huequita%20Quite%C3%B1a!5e0!3m2!1sen!2sec!4v1770436855942!5m2!1sen!2sec"
                         >
                         </iframe>
                         {/* Fallback if no key (using standard embed for specific location if key is missing/invalid logic needed but for now simple iframe structure) 
