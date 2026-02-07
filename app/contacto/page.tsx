@@ -132,7 +132,8 @@ export default function ContactoPage() {
                             loading="lazy"
                             allowFullScreen
                             referrerPolicy="no-referrer-when-downgrade"
-                            src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY || ""}&q=${DEFAULT_CENTER.lat},${DEFAULT_CENTER.lng}&zoom=15`}
+                            title="Mapa de Ubicación La Huequita"
+                            src={`https://maps.google.com/maps?q=${DEFAULT_CENTER.lat},${DEFAULT_CENTER.lng}&hl=es&z=15&output=embed`}
                         >
                         </iframe>
                         {/* Fallback if no key (using standard embed for specific location if key is missing/invalid logic needed but for now simple iframe structure) 
