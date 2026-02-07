@@ -22,6 +22,8 @@ export default function ProductCatalog({ initialProducts, categories }: ProductC
     const [debouncedSearch, setDebouncedSearch] = useState("");
     const [loading, setLoading] = useState(false);
 
+    const [displayLimit, setDisplayLimit] = useState(24);
+
     // Debounce search effect
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -30,6 +32,11 @@ export default function ProductCatalog({ initialProducts, categories }: ProductC
 
         return () => clearTimeout(timer);
     }, [searchQuery]);
+
+    // Reset pagination when filters change
+    useEffect(() => {
+        setDisplayLimit(24);
+    }, [selectedCategory, debouncedSearch]);
 
     useEffect(() => {
         if (selectedBranch) {
@@ -56,6 +63,13 @@ export default function ProductCatalog({ initialProducts, categories }: ProductC
             return matchesCategory && matchesSearch;
         });
     }, [products, selectedCategory, debouncedSearch]);
+
+    const visibleProducts = filteredProducts.slice(0, displayLimit);
+    const hasMore = visibleProducts.length < filteredProducts.length;
+
+    const handleLoadMore = () => {
+        setDisplayLimit(prev => prev + 24);
+    };
 
     return (
         <div className="flex flex-col lg:flex-row gap-8 md:gap-16">
@@ -92,26 +106,43 @@ export default function ProductCatalog({ initialProducts, categories }: ProductC
                                 ))}
                             </div>
                         ) : filteredProducts.length > 0 ? (
-                            <motion.div
-                                layout
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8"
-                            >
-                                {filteredProducts.map((product) => (
-                                    <ProductCard
-                                        key={product.id}
-                                        id={product.id}
-                                        nombre={product.nombre}
-                                        slug={product.slug}
-                                        precio={product.precio}
-                                        categoria={product.categoria_nombre}
-                                        esPremium={product.es_premium}
-                                        imagen={product.image || product.imagen}
-                                        stock={product.stock_total}
-                                    />
-                                ))}
-                            </motion.div>
+                            <>
+                                <motion.div
+                                    layout
+                                    initial={{ opacity: 0 }}
+                                    animate={{ opacity: 1 }}
+                                    className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-8"
+                                >
+                                    {visibleProducts.map((product) => (
+                                        <ProductCard
+                                            key={product.id}
+                                            id={product.id}
+                                            nombre={product.nombre}
+                                            slug={product.slug}
+                                            precio={product.precio}
+                                            categoria={product.categoria_nombre}
+                                            esPremium={product.es_premium}
+                                            imagen={product.image || product.imagen}
+                                            stock={product.stock_total}
+                                        />
+                                    ))}
+                                </motion.div>
+
+                                {hasMore && (
+                                    <div className="mt-12 flex justify-center">
+                                        <button
+                                            onClick={handleLoadMore}
+                                            className="group relative px-8 py-3 bg-transparent overflow-hidden rounded-full border border-primary/30 hover:border-primary transition-colors"
+                                        >
+                                            <div className="absolute inset-0 w-0 bg-primary transition-all duration-[250ms] ease-out group-hover:w-full opacity-10"></div>
+                                            <span className="relative text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+                                                Cargar más productos
+                                                <span className="material-symbols-outlined text-sm group-hover:translate-y-0.5 transition-transform">expand_more</span>
+                                            </span>
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         ) : (
                             <motion.div
                                 initial={{ opacity: 0 }}
